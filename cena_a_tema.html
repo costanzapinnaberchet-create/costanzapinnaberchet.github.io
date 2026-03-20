@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🕯 Cena per due — vota!</title>
+  <style>
+    :root {
+      --bg:        #ffffff;
+      --bg2:       #f5f4f0;
+      --bg3:       #eeedea;
+      --bg-info:   #e6f1fb;
+      --bg-success:#eaf3de;
+      --bg-warn:   #faeeda;
+      --text:      #1a1a18;
+      --text2:     #5f5e5a;
+      --text3:     #888780;
+      --text-info: #185fa5;
+      --text-suc:  #3b6d11;
+      --text-warn: #854f0b;
+      --border:    rgba(0,0,0,0.10);
+      --border2:   rgba(0,0,0,0.18);
+      --border-info: #378add;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #1c1c1a;
+        --bg2:       #252523;
+        --bg3:       #2e2e2b;
+        --bg-info:   #042c53;
+        --bg-success:#173404;
+        --bg-warn:   #412402;
+        --text:      #e8e6de;
+        --text2:     #9c9a92;
+        --text3:     #6b6a63;
+        --text-info: #85b7eb;
+        --text-suc:  #c0dd97;
+        --text-warn: #fac775;
+        --border:    rgba(255,255,255,0.10);
+        --border2:   rgba(255,255,255,0.18);
+        --border-info: #378add;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg3);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 2rem 1.75rem;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.07);
+    }
+
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+    .header p  { font-size: 13px; color: var(--text2); }
+
+    .section { margin-bottom: 1.4rem; }
+    .section-label {
+      font-size: 11px; font-weight: 500; letter-spacing: .07em;
+      color: var(--text3); margin-bottom: 8px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content:''; flex:1; border-top: 0.5px solid var(--border); }
+    .section-note { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
+
+    .opt-card {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 13px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      background: var(--bg);
+    }
+    .opt-card:hover { border-color: var(--border2); background: var(--bg2); }
+    .opt-card.selected { border: 2px solid var(--border-info); background: var(--bg-info); }
+    .opt-card.done { cursor: default; }
+    .opt-card.done:not(.selected):hover { background: var(--bg); border-color: var(--border); }
+    .opt-card.selected .opt-title { color: var(--text-info); }
+    .opt-card.selected .opt-sub   { color: var(--text-info); opacity: .75; }
+
+    .opt-icon  { font-size: 20px; margin-bottom: 5px; display: block; line-height: 1; }
+    .opt-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .opt-sub   { font-size: 11px; color: var(--text2); margin-bottom: 5px; line-height: 1.45; }
+
+    .badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 500; }
+    .b-date { background: var(--bg-success); color: var(--text-suc); }
+    .b-fun  { background: var(--bg2); color: var(--text2); border: 0.5px solid var(--border); }
+
+    /* Cuisine */
+    .cuisine-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .cuisine-card {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 8px 8px;
+      cursor: pointer;
+      background: var(--bg);
+      transition: border-color .15s, background .15s;
+      text-align: center;
+    }
+    .cuisine-card:hover { border-color: var(--border2); background: var(--bg2); }
+    .cuisine-card.selected { border: 2px solid var(--border-info); background: var(--bg-info); }
+    .cuisine-card.done { cursor: default; }
+    .cuisine-card.done:not(.selected):hover { background: var(--bg); border-color: var(--border); }
+    .cuisine-icon { font-size: 22px; display: block; margin-bottom: 4px; line-height: 1; }
+    .cuisine-name { font-size: 11px; font-weight: 500; color: var(--text); display: block; margin-bottom: 2px; }
+    .cuisine-sub  { font-size: 10px; color: var(--text3); display: block; line-height: 1.4; }
+    .cuisine-card.selected .cuisine-name { color: var(--text-info); }
+    .cuisine-card.selected .cuisine-sub  { color: var(--text-info); opacity: .75; }
+    .cuisine-sel-note { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+    /* Bars */
+    .bar-wrap { margin-top: 7px; display: flex; align-items: center; gap: 5px; opacity: 0; transition: opacity .4s; }
+    .bar-wrap.show { opacity: 1; }
+    .bar-track { flex:1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 2px; transition: width .55s ease; width: 0%; }
+    .c0{background:#378ADD} .c1{background:#1D9E75} .c2{background:#D85A30}
+    .c3{background:#7F77DD} .c4{background:#BA7517} .c5{background:#185FA5}
+    .c6{background:#0F6E56} .c7{background:#993556}
+    .bar-num { font-size: 10px; color: var(--text2); min-width: 12px; text-align: right; }
+
+    .cuisine-bar { margin-top: 5px; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .4s; }
+    .cuisine-bar.show { opacity: 1; }
+    .cuisine-bar .bar-track { flex:1; }
+    .cuisine-bar .bar-num { font-size: 10px; color: var(--text2); min-width: 10px; }
+
+    /* Actions */
+    .progress { font-size: 12px; color: var(--text3); text-align: center; margin-top: .85rem; }
+    .progress strong { color: var(--text2); }
+
+    .action-row { display: flex; gap: 10px; margin-top: 1.25rem; }
+    .btn {
+      flex:1; padding: 10px; font-size: 14px;
+      border-radius: var(--radius-md); cursor: pointer;
+      border: 0.5px solid var(--border2);
+      background: transparent; color: var(--text);
+      transition: background .15s;
+    }
+    .btn:hover { background: var(--bg2); }
+    .btn.primary {
+      background: var(--text); color: var(--bg);
+      border-color: transparent;
+    }
+    .btn.primary:hover { opacity: .85; }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--text); color: var(--bg);
+      padding: 8px 20px; border-radius: 99px; font-size: 13px;
+      opacity: 0; transition: opacity .2s, transform .2s;
+      pointer-events: none; z-index: 99;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.25rem 1rem; }
+      .grid-3, .cuisine-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>🕯 Cena per due — vota!</h1>
+    <p>Scegli un'opzione per ogni categoria</p>
+  </div>
+
+  <!-- 1 · Partita -->
+  <div class="section">
+    <div class="section-label">1 · La partita</div>
+    <div class="grid-2">
+      <div class="opt-card" data-g="0" data-i="0" onclick="pick(this)">
+        <span class="opt-icon">🏀</span>
+        <p class="opt-title">Libertas Rimini</p>
+        <p class="opt-sub">Serie A2 basket</p>
+        <span class="badge b-date">18 apr</span>
+        <div class="bar-wrap" id="b-0-0"><div class="bar-track"><div class="bar-fill c0" id="f-0-0"></div></div><span class="bar-num" id="n-0-0">0</span></div>
+      </div>
+      <div class="opt-card" data-g="0" data-i="1" onclick="pick(this)">
+        <span class="opt-icon">⚽</span>
+        <p class="opt-title">Livorno – Torres</p>
+        <p class="opt-sub">Serie C calcio</p>
+        <span class="badge b-date">28 mar</span>
+        <div class="bar-wrap" id="b-0-1"><div class="bar-track"><div class="bar-fill c1" id="f-0-1"></div></div><span class="bar-num" id="n-0-1">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · Tema -->
+  <div class="section">
+    <div class="section-label">2 · Tema della serata</div>
+    <div class="grid-2">
+      <div class="opt-card" data-g="1" data-i="0" onclick="pick(this)">
+        <span class="opt-icon">🎲</span>
+        <p class="opt-title">Serata giochi</p>
+        <p class="opt-sub">Giochi da tavolo, carte, quiz — chi perde fa i piatti</p>
+        <span class="badge b-fun">competitivo</span>
+        <div class="bar-wrap" id="b-1-0"><div class="bar-track"><div class="bar-fill c2" id="f-1-0"></div></div><span class="bar-num" id="n-1-0">0</span></div>
+      </div>
+      <div class="opt-card" data-g="1" data-i="1" onclick="pick(this)">
+        <span class="opt-icon">🗺️</span>
+        <p class="opt-title">Planning viaggi</p>
+        <p class="opt-sub">Mappa, wishlist, voli aperti — si decide il prossimo posto</p>
+        <span class="badge b-fun">sognante</span>
+        <div class="bar-wrap" id="b-1-1"><div class="bar-track"><div class="bar-fill c3" id="f-1-1"></div></div><span class="bar-num" id="n-1-1">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · Cucina -->
+  <div class="section">
+    <div class="section-label">3 · Cucina — street food world</div>
+    <div class="section-note">puoi sceglierne più d'una</div>
+    <div class="cuisine-grid">
+      <div class="cuisine-card" data-ci="0" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🍣</span>
+        <span class="cuisine-name">Giapponese</span>
+        <span class="cuisine-sub">sushi</span>
+        <div class="cuisine-bar" id="cb-0"><div class="bar-track"><div class="bar-fill c0" id="cf-0"></div></div><span class="bar-num" id="cn-0">0</span></div>
+      </div>
+      <div class="cuisine-card" data-ci="1" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🥙</span>
+        <span class="cuisine-name">Greco</span>
+        <span class="cuisine-sub">πίτα · φύλλο με μέλι</span>
+        <div class="cuisine-bar" id="cb-1"><div class="bar-track"><div class="bar-fill c1" id="cf-1"></div></div><span class="bar-num" id="cn-1">0</span></div>
+      </div>
+      <div class="cuisine-card" data-ci="2" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🥘</span>
+        <span class="cuisine-name">Spagnolo</span>
+        <span class="cuisine-sub">patatas bravas · cheesecake basca</span>
+        <div class="cuisine-bar" id="cb-2"><div class="bar-track"><div class="bar-fill c2" id="cf-2"></div></div><span class="bar-num" id="cn-2">0</span></div>
+      </div>
+      <div class="cuisine-card" data-ci="3" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🧀</span>
+        <span class="cuisine-name">Brasiliano</span>
+        <span class="cuisine-sub">pão de queijo · brigadeiros</span>
+        <div class="cuisine-bar" id="cb-3"><div class="bar-track"><div class="bar-fill c3" id="cf-3"></div></div><span class="bar-num" id="cn-3">0</span></div>
+      </div>
+      <div class="cuisine-card" data-ci="4" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🥟</span>
+        <span class="cuisine-name">Cileno</span>
+        <span class="cuisine-sub">empanadas · pie de limón</span>
+        <div class="cuisine-bar" id="cb-4"><div class="bar-track"><div class="bar-fill c4" id="cf-4"></div></div><span class="bar-num" id="cn-4">0</span></div>
+      </div>
+      <div class="cuisine-card" data-ci="5" onclick="pickCuisine(this)">
+        <span class="cuisine-icon">🥯</span>
+        <span class="cuisine-name">New Yorker</span>
+        <span class="cuisine-sub">bagel · cheesecake</span>
+        <div class="cuisine-bar" id="cb-5"><div class="bar-track"><div class="bar-fill c5" id="cf-5"></div></div><span class="bar-num" id="cn-5">0</span></div>
+      </div>
+    </div>
+    <p class="cuisine-sel-note" id="cuisine-note">nessuna selezionata</p>
+  </div>
+
+  <!-- 4 · Aperitivo -->
+  <div class="section">
+    <div class="section-label">4 · Aperitivo</div>
+    <div class="grid-3">
+      <div class="opt-card" data-g="2" data-i="0" onclick="pick(this)">
+        <span class="opt-icon">🍺</span>
+        <p class="opt-title">Beer & chips</p>
+        <p class="opt-sub">Birra artigianale, nachos con guac, ali di pollo speziate</p>
+        <div class="bar-wrap" id="b-2-0"><div class="bar-track"><div class="bar-fill c0" id="f-2-0"></div></div><span class="bar-num" id="n-2-0">0</span></div>
+      </div>
+      <div class="opt-card" data-g="2" data-i="1" onclick="pick(this)">
+        <span class="opt-icon">🍊</span>
+        <p class="opt-title">Aperitivo italiano</p>
+        <p class="opt-sub">Spritz o Negroni, bruschette, tagliere salumi e formaggi</p>
+        <div class="bar-wrap" id="b-2-1"><div class="bar-track"><div class="bar-fill c2" id="f-2-1"></div></div><span class="bar-num" id="n-2-1">0</span></div>
+      </div>
+      <div class="opt-card" data-g="2" data-i="2" onclick="pick(this)">
+        <span class="opt-icon">🧃</span>
+        <p class="opt-title">Analcolico creativo</p>
+        <p class="opt-sub">Mocktail allo zenzero, skewer di frutta, hummus e pane caldo</p>
+        <div class="bar-wrap" id="b-2-2"><div class="bar-track"><div class="bar-fill c1" id="f-2-2"></div></div><span class="bar-num" id="n-2-2">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · Dress code -->
+  <div class="section">
+    <div class="section-label">5 · Dress code</div>
+    <div class="grid-3">
+      <div class="opt-card" data-g="3" data-i="0" onclick="pick(this)">
+        <span class="opt-icon">👟</span>
+        <p class="opt-title">Casual</p>
+        <p class="opt-sub">Comodo, rilassato, nessuna pretesa</p>
+        <div class="bar-wrap" id="b-3-0"><div class="bar-track"><div class="bar-fill c3" id="f-3-0"></div></div><span class="bar-num" id="n-3-0">0</span></div>
+      </div>
+      <div class="opt-card" data-g="3" data-i="1" onclick="pick(this)">
+        <span class="opt-icon">🥂</span>
+        <p class="opt-title">Elegante</p>
+        <p class="opt-sub">Come al ristorante — ma si sta a casa</p>
+        <div class="bar-wrap" id="b-3-1"><div class="bar-track"><div class="bar-fill c4" id="f-3-1"></div></div><span class="bar-num" id="n-3-1">0</span></div>
+      </div>
+      <div class="opt-card" data-g="3" data-i="2" onclick="pick(this)">
+        <span class="opt-icon">🌙</span>
+        <p class="opt-title">Pigiama chic</p>
+        <p class="opt-sub">Pigiama coordinato, pantofole di lusso, massima comodità</p>
+        <div class="bar-wrap" id="b-3-2"><div class="bar-track"><div class="bar-fill c7" id="f-3-2"></div></div><span class="bar-num" id="n-3-2">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="progress">Categorie completate: <strong id="sel-count">0</strong> su <strong>5</strong> <span style="color:var(--text3)">(cucina: almeno 1)</span></p>
+
+  <div class="action-row">
+    <button class="btn" onclick="resetAll()">Ricomincia</button>
+    <button class="btn primary" id="vote-btn" onclick="vote()" disabled>Conferma ↗</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const GROUPS = 4;
+const SIZES  = [2, 2, 3, 3];
+const votes  = SIZES.map(s => Array(s).fill(0));
+const cuisineVotes = Array(6).fill(0);
+let sel = {};
+let cuisineSel = new Set();
+let hasVoted = false;
+
+function checkReady() {
+  document.getElementById('vote-btn').disabled =
+    !(Object.keys(sel).length === GROUPS && cuisineSel.size > 0);
+  document.getElementById('sel-count').textContent =
+    Object.keys(sel).length + (cuisineSel.size > 0 ? 1 : 0);
+}
+
+function pick(card) {
+  if (hasVoted) return;
+  const g = card.dataset.g;
+  document.querySelectorAll(`[data-g="${g}"]`).forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  sel[g] = parseInt(card.dataset.i);
+  checkReady();
+}
+
+function pickCuisine(card) {
+  if (hasVoted) return;
+  const i = parseInt(card.dataset.ci);
+  card.classList.toggle('selected');
+  if (card.classList.contains('selected')) cuisineSel.add(i);
+  else cuisineSel.delete(i);
+  const n = cuisineSel.size;
+  document.getElementById('cuisine-note').textContent =
+    n === 0 ? 'nessuna selezionata' : `${n} selezionat${n===1?'a':'e'}`;
+  checkReady();
+}
+
+function vote() {
+  if (hasVoted) return;
+  Object.entries(sel).forEach(([g, i]) => votes[g][i]++);
+  cuisineSel.forEach(i => cuisineVotes[i]++);
+  hasVoted = true;
+  document.getElementById('vote-btn').disabled = true;
+  document.querySelectorAll('.opt-card, .cuisine-card').forEach(c => c.classList.add('done'));
+  showBars();
+  showToast('Voto registrato! 🎉');
+}
+
+function showBars() {
+  for (let g = 0; g < GROUPS; g++) {
+    const total = votes[g].reduce((a,b)=>a+b,0) || 1;
+    for (let i = 0; i < SIZES[g]; i++) {
+      const pct = Math.round(votes[g][i] / total * 100);
+      const bw = document.getElementById(`b-${g}-${i}`);
+      if (!bw) continue;
+      bw.classList.add('show');
+      document.getElementById(`n-${g}-${i}`).textContent = votes[g][i];
+      setTimeout(() => { document.getElementById(`f-${g}-${i}`).style.width = pct + '%'; }, 60);
+    }
+  }
+  const cTotal = cuisineVotes.reduce((a,b)=>a+b,0) || 1;
+  for (let i = 0; i < 6; i++) {
+    const pct = Math.round(cuisineVotes[i] / cTotal * 100);
+    document.getElementById(`cb-${i}`).classList.add('show');
+    document.getElementById(`cn-${i}`).textContent = cuisineVotes[i];
+    setTimeout(() => { document.getElementById(`cf-${i}`).style.width = pct + '%'; }, 60);
+  }
+}
+
+function resetAll() {
+  hasVoted = false; sel = {}; cuisineSel = new Set();
+  for (let g = 0; g < GROUPS; g++) votes[g].fill(0);
+  cuisineVotes.fill(0);
+  document.querySelectorAll('.opt-card, .cuisine-card')
+    .forEach(c => c.classList.remove('selected','done'));
+  for (let g = 0; g < GROUPS; g++) for (let i = 0; i < SIZES[g]; i++) {
+    const bw = document.getElementById(`b-${g}-${i}`);
+    if (bw) bw.classList.remove('show');
+    const f = document.getElementById(`f-${g}-${i}`);
+    if (f) f.style.width = '0%';
+    const n = document.getElementById(`n-${g}-${i}`);
+    if (n) n.textContent = '0';
+  }
+  for (let i = 0; i < 6; i++) {
+    document.getElementById(`cb-${i}`).classList.remove('show');
+    document.getElementById(`cf-${i}`).style.width = '0%';
+    document.getElementById(`cn-${i}`).textContent = '0';
+  }
+  document.getElementById('cuisine-note').textContent = 'nessuna selezionata';
+  document.getElementById('sel-count').textContent = '0';
+  document.getElementById('vote-btn').disabled = true;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
