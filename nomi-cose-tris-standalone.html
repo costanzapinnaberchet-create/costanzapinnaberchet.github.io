@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Nomi Cose Tris</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@700;800&family=Patrick+Hand&display=swap">
+<style>
+/* Layout: una colonna stretta come la pagina del libretto di enigmistica: fascia blu con titolo, giocatori, griglia 6x6 con lettere in colonna, categorie in riga e righe a fasce lilla. */
+:root {
+  --paper: #f6f6fb;
+  --ink: #1d1b4b;
+  --ink-2: #4a4878;
+  --head: #2b2a6b;
+  --row-a: #ffffff;
+  --row-b: #e6e5f5;
+  --line: #b9b7dc;
+  --accent: #c8195f;
+  --on-accent: #ffffff;
+  --o: #c8195f;
+  --x: #0a5f7a;
+  --focus: #0b57d0;
+  --hover: rgba(200, 25, 95, 0.09);
+  --win-bg: #ffe9a3;
+  --win-ring: #1d1b4b;
+  --err: #b00020;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hand: "Patrick Hand", "Comic Sans MS", "Segoe Print", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12112b;
+    --ink: #ecebff;
+    --ink-2: #b4b2e0;
+    --head: #2a2970;
+    --row-a: #1b1a3f;
+    --row-b: #242252;
+    --line: #4a4890;
+    --accent: #ff5c9d;
+    --on-accent: #1a0a14;
+    --o: #ff5c9d;
+    --x: #4fd0f0;
+    --focus: #ffd84d;
+    --hover: rgba(255, 92, 157, 0.16);
+    --win-bg: #4d3f00;
+    --win-ring: #ffd84d;
+    --err: #ff8a9c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12112b;
+  --ink: #ecebff;
+  --ink-2: #b4b2e0;
+  --head: #2a2970;
+  --row-a: #1b1a3f;
+  --row-b: #242252;
+  --line: #4a4890;
+  --accent: #ff5c9d;
+  --on-accent: #1a0a14;
+  --o: #ff5c9d;
+  --x: #4fd0f0;
+  --focus: #ffd84d;
+  --hover: rgba(255, 92, 157, 0.16);
+  --win-bg: #4d3f00;
+  --win-ring: #ffd84d;
+  --err: #ff8a9c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 640px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+h1, h2 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--head); color: #fff;
+  padding: 12px 22px 12px 14px;
+  border-radius: 999px 18px 18px 999px;
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.05;
+}
+.brand::before {
+  content: ""; flex: none; width: 2.1rem; height: 2.1rem;
+  border-radius: 50%; background: var(--accent);
+}
+
+.stack { display: flex; flex-direction: column; gap: 18px; }
+.names { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+label, legend { font-weight: 700; }
+input[type="text"] {
+  font: inherit; color: var(--ink); background: var(--row-a);
+  border: 2px solid var(--line); border-radius: 12px;
+  min-height: 48px; padding: 8px 14px; width: 100%;
+}
+input[type="text"]:focus-visible { border-color: var(--focus); }
+#code { text-transform: uppercase; letter-spacing: 0.25em; font-weight: 700; max-width: 12rem; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+legend { padding: 0; margin-bottom: 8px; }
+.choice-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.choice { position: relative; display: block; min-width: 0; }
+.choice input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; opacity: 0; cursor: pointer;
+}
+.choice .body {
+  display: flex; align-items: center; gap: 10px; min-height: 56px;
+  padding: 10px 14px; border: 2px solid var(--line); border-radius: 12px;
+  background: var(--row-a);
+}
+.choice .body::after { content: "\2713"; margin-left: auto; font-weight: 700; visibility: hidden; color: var(--accent); }
+.choice input:checked + .body { border-color: var(--accent); background: var(--row-b); box-shadow: inset 0 0 0 1px var(--accent); }
+.choice input:checked + .body::after { visibility: visible; }
+.choice input:focus-visible + .body { outline: 3px solid var(--focus); outline-offset: 2px; }
+.choice .body svg { width: 26px; height: 26px; flex: none; }
+.choice .sub { display: block; font-size: 0.85rem; color: var(--ink-2); line-height: 1.25; }
+.choice .t { display: block; font-weight: 700; line-height: 1.2; }
+.sym-O { color: var(--o); }
+.sym-X { color: var(--x); }
+
+.btn {
+  font: inherit; font-weight: 700; cursor: pointer;
+  min-height: 48px; padding: 10px 20px; border-radius: 12px;
+  border: 2px solid var(--line); background: transparent; color: var(--ink);
+}
+.btn:hover { background: var(--hover); }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+
+.code-big {
+  font-family: var(--display); font-weight: 800; font-size: clamp(2.6rem, 14vw, 4rem);
+  letter-spacing: 0.18em; line-height: 1; color: var(--accent);
+}
+
+.players { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pcard {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  padding: 10px 12px; border: 2px solid var(--line); border-radius: 14px; background: var(--row-a);
+}
+.pcard.active { border-color: var(--accent); background: var(--row-b); box-shadow: 0 0 0 1px var(--accent); }
+.chip {
+  flex: none; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--row-a); border: 2px solid var(--line);
+}
+.chip svg { width: 24px; height: 24px; }
+.pinfo { min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.pname { font-weight: 700; overflow-wrap: anywhere; }
+.ptag { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
+.turn { font-size: 1.1rem; font-weight: 700; }
+.turn:focus { outline: none; }
+
+.board-wrap { border: 2px solid var(--head); border-radius: 12px; overflow: hidden; background: var(--row-a); }
+table.board { width: 100%; border-collapse: collapse; table-layout: fixed; }
+col.rh { width: 40px; }
+.board th {
+  background: var(--head); color: #fff; font-family: var(--display); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: center; vertical-align: middle;
+}
+.board thead th { font-size: 2rem; font-weight: 800; line-height: 1; padding: 8px 0; }
+.board tbody th { padding: 4px 0; }
+.vtext {
+  display: block; margin: 0 auto; writing-mode: vertical-rl; transform: rotate(180deg);
+  max-height: 72px; font-size: clamp(0.68rem, 2.8vw, 0.9rem); line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+.board td { padding: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); background: var(--row-a); }
+.board tbody tr:nth-child(even) td { background: var(--row-b); }
+button.cell {
+  font: inherit; color: var(--ink); background: transparent; border: 0;
+  width: 100%; min-height: 76px; padding: 4px 2px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+button.cell[aria-disabled="true"] { cursor: default; }
+button.cell:focus-visible { outline-offset: -4px; }
+button.cell:not(.filled):not([aria-disabled="true"]):hover { background: var(--hover); }
+.cell .mark svg { width: clamp(18px, 5.5vw, 28px); height: clamp(18px, 5.5vw, 28px); display: block; }
+.cell .ans {
+  font-family: var(--hand); font-size: clamp(0.74rem, 3.2vw, 1.05rem); line-height: 1.05;
+  text-align: center; max-width: 100%; overflow-wrap: anywhere; hyphens: auto;
+}
+.board td.win-cell { background: var(--win-bg) !important; box-shadow: inset 0 0 0 3px var(--win-ring); }
+@keyframes pop { from { transform: scale(0.6); opacity: 0.2; } to { transform: scale(1); opacity: 1; } }
+.cell.pop .mark { animation: pop 0.22s ease-out; }
+@media (prefers-reduced-motion: reduce) { .cell.pop .mark { animation: none; } }
+
+.result {
+  border: 3px solid var(--accent); border-radius: 16px; background: var(--row-b);
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.result:focus { outline: none; }
+.result h2 { font-family: var(--display); font-weight: 800; font-size: 1.9rem; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.05; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.muted { color: var(--ink-2); font-size: 0.95rem; overflow-wrap: anywhere; }
+.err { color: var(--err); font-weight: 700; }
+
+dialog {
+  padding: 0; border: 3px solid var(--head); border-radius: 16px;
+  background: var(--paper); color: var(--ink); width: min(92vw, 420px);
+}
+dialog::backdrop { background: rgba(10, 9, 40, 0.62); }
+.dlg { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.dlg h2 { font-family: var(--display); font-weight: 800; font-size: 1.7rem; text-transform: uppercase; line-height: 1.05; }
+.dlg p { overflow-wrap: anywhere; }
+.who { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.who svg { width: 22px; height: 22px; }
+.timer { display: flex; align-items: center; gap: 10px; }
+.timer .bar { flex: 1; height: 12px; border-radius: 6px; background: var(--row-b); border: 1px solid var(--line); overflow: hidden; }
+.timer .bar span { display: block; height: 100%; width: 100%; background: var(--accent); }
+.timer .secs { font-family: var(--display); font-weight: 800; font-size: 1.7rem; min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; line-height: 1; }
+.timer.low .secs { color: var(--err); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1 class="brand">Nomi Cose Tris</h1>
+
+  <section id="setup" aria-labelledby="setupTitle">
+    <div class="stack">
+      <h2 id="setupTitle" class="sr-only">Nuova partita</h2>
+      <form id="setupForm" class="stack" novalidate>
+        <fieldset id="modeSet" hidden>
+          <legend>Dove giocate?</legend>
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="mode" value="local" checked>
+              <span class="body"><span><span class="t">Stesso schermo</span><span class="sub">Ci si passa il dispositivo</span></span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="mode" value="online">
+              <span class="body"><span><span class="t">Schermi diversi</span><span class="sub">Ognuno gioca dal suo</span></span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset id="roleSet" hidden>
+          <legend>Stanza</legend>
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="role" value="create" checked>
+              <span class="body"><span class="t">Crea una stanza</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="role" value="join">
+              <span class="body"><span class="t">Entra con un codice</span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="names">
+          <div class="field">
+            <label for="nameA" id="lblA">Giocatore A</label>
+            <input id="nameA" type="text" maxlength="16" autocomplete="off" placeholder="Giocatore A">
+          </div>
+          <div class="field" id="fieldB">
+            <label for="nameB">Giocatore B</label>
+            <input id="nameB" type="text" maxlength="16" autocomplete="off" placeholder="Giocatore B">
+          </div>
+        </div>
+
+        <div class="field" id="codeField" hidden>
+          <label for="code">Codice stanza</label>
+          <input id="code" type="text" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="K7QD">
+        </div>
+
+        <fieldset id="symSet">
+          <legend id="legSym">Simbolo del Giocatore A</legend>
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="symA" value="O" checked>
+              <span class="body sym-O"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="3.2"/></svg><span class="t" style="color:var(--ink)">O</span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="symA" value="X">
+              <span class="body sym-X"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5L19 19M19 5L5 19" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg><span class="t" style="color:var(--ink)">X</span></span>
+            </label>
+          </div>
+          <p class="muted">L’avversario usa l’altro simbolo.</p>
+        </fieldset>
+
+        <fieldset id="winSet">
+          <legend>Per vincere servono</legend>
+          <div class="choice-row">
+            <label class="choice">
+              <input type="radio" name="winLen" value="4" checked>
+              <span class="body"><span><span class="t">4 in fila</span><span class="sub">Come nel libretto</span></span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="winLen" value="5">
+              <span class="body"><span><span class="t">5 in fila</span><span class="sub">Cinque consecutive</span></span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="winLen" value="6">
+              <span class="body"><span><span class="t">6 in fila</span><span class="sub">Riga, colonna o diagonale intera</span></span></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div id="timerSet">
+          <label class="choice">
+            <input type="checkbox" id="timerOn" checked>
+            <span class="body"><span><span class="t">Timer di 15 secondi</span><span class="sub">Per scrivere ogni risposta</span></span></span>
+          </label>
+        </div>
+
+        <p class="err" id="setupErr" role="alert" hidden></p>
+        <div class="row"><button class="btn primary" type="submit" id="goBtn">Inizia la partita</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="waiting" aria-labelledby="waitTitle" hidden>
+    <div class="stack">
+      <h2 id="waitTitle" tabindex="-1">In attesa dell’avversario</h2>
+      <div>
+        <p>Codice stanza</p>
+        <p class="code-big" id="waitCode" aria-hidden="true"></p>
+        <p class="sr-only" id="waitCodeSpoken"></p>
+      </div>
+      <p>Sull’altro schermo apri questa pagina, scegli «Schermi diversi» e poi «Entra con un codice».</p>
+      <p class="muted">Chi entra deve poter modificare i dati della pagina (permesso Contributor nel menu Condividi).</p>
+      <div class="row"><button class="btn" type="button" id="cancelRoom">Annulla</button></div>
+    </div>
+  </section>
+
+  <section id="game" aria-labelledby="gameTitle" hidden>
+    <div class="stack">
+      <h2 id="gameTitle" class="sr-only">Partita in corso</h2>
+
+      <div class="players">
+        <div class="pcard" id="card0">
+          <span class="chip" id="chip0"></span>
+          <span class="pinfo"><span class="pname" id="pname0"></span><span class="ptag" id="ptag0" hidden>In turno</span></span>
+        </div>
+        <div class="pcard" id="card1">
+          <span class="chip" id="chip1"></span>
+          <span class="pinfo"><span class="pname" id="pname1"></span><span class="ptag" id="ptag1" hidden>In turno</span></span>
+        </div>
+      </div>
+
+      <p class="turn" id="turnText" tabindex="-1"></p>
+      <p class="err" id="netMsg" role="alert" hidden></p>
+
+      <div class="board-wrap">
+        <table class="board" id="board"></table>
+      </div>
+
+      <div id="result" class="result" tabindex="-1" hidden>
+        <h2 id="resultTitle"></h2>
+        <p id="resultText"></p>
+        <div class="row">
+          <button class="btn primary" type="button" id="rematchBtn">Rivincita</button>
+          <button class="btn" type="button" id="editBtn">Cambia giocatori</button>
+        </div>
+      </div>
+
+      <p class="muted" id="lastMove" hidden></p>
+      <div class="row">
+        <button class="btn" type="button" id="contestBtn" hidden>Contesta l’ultima risposta</button>
+        <button class="btn" type="button" id="restartBtn">Ricomincia</button>
+      </div>
+      <p class="muted" id="roomInfo" hidden></p>
+    </div>
+  </section>
+</div>
+
+<div class="sr-only" id="live" role="status" aria-live="polite"></div>
+
+<dialog id="answerDlg" aria-labelledby="ansTitle">
+  <div class="dlg">
+    <h2 id="ansTitle"></h2>
+    <div class="who" id="ansWho"></div>
+    <div class="timer" id="ansTimer" hidden>
+      <div class="bar" aria-hidden="true"><span id="ansBar"></span></div>
+      <span class="secs" id="ansSecs" aria-hidden="true">15</span>
+    </div>
+    <p class="sr-only" id="ansLive" role="status" aria-live="polite"></p>
+    <form id="ansForm" class="stack" novalidate>
+      <div class="field">
+        <label for="ansInput" id="ansLabel">La tua risposta</label>
+        <input id="ansInput" type="text" maxlength="30" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" aria-describedby="ansHint ansErr">
+        <span class="muted" id="ansHint"></span>
+        <p class="err" id="ansErr" role="alert" hidden></p>
+      </div>
+      <div class="row">
+        <button class="btn primary" type="submit">Conferma</button>
+        <button class="btn" type="button" id="ansCancel">Annulla</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="confirmDlg" aria-labelledby="cfTitle">
+  <div class="dlg">
+    <h2 id="cfTitle"></h2>
+    <p id="cfBody"></p>
+    <form method="dialog" class="row">
+      <button class="btn primary" value="ok" id="cfOk"></button>
+      <button class="btn" value="cancel" id="cfNo"></button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.lang = "it";
+
+  var N = 6;
+  var LIMIT = 15;
+  var CATS = ["Nomi", "Città", "Cibi e bevande", "Film", "Animali", "Oggetti", "Personaggi TV",
+    "Mestieri", "Sport", "Paesi", "Frutta e verdura", "Cantanti", "Marche"];
+  var LETTERS = "ABCDEFGLMNPRSTV".split("");
+  var SVG = {
+    O: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="3.2"/></svg>',
+    X: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5L19 19M19 5L5 19" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>'
+  };
+
+  // Stato di gioco. Righe = categorie, colonne = lettere.
+  var S = null;
+  var room = null;        // {code, me, ref, unsub} quando si gioca online
+  var db = null;
+  var focusPos = { r: 0, c: 0 };
+  var pending = null;
+  var liveTimer = null;
+  var gridKey = "";
+  var pushing = Promise.resolve();
+  var cid = clientId();
+
+  function $(id) { return document.getElementById(id); }
+  function clientId() {
+    try {
+      var v = sessionStorage.getItem("nct-cid");
+      if (!v) {
+        v = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+        sessionStorage.setItem("nct-cid", v);
+      }
+      return v;
+    } catch (e) {
+      return Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+    }
+  }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function norm(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function upFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function sym(p) { return S.syms[p]; }
+  function pname(p) { return S.names[p]; }
+  function announce(msg) {
+    var l = $("live");
+    l.textContent = "";
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(function () { l.textContent = msg; }, 60);
+  }
+  function openDlg(d) {
+    if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", "");
+  }
+  function show(which) {
+    $("setup").hidden = which !== "setup";
+    $("waiting").hidden = which !== "waiting";
+    $("game").hidden = which !== "game";
+  }
+  function withTimeout(p, ms) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () { reject({ msg: "Non riesco a raggiungere la stanza. Controlla la connessione e riprova." }); }, ms);
+      p.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
+  function errText(e) {
+    if (e && e.msg) return e.msg;
+    if (e && e.code === "invalid_argument") {
+      return "Non hai il permesso di giocare online. Chiedi a chi ha creato la pagina di condividerla con te come Contributor.";
+    }
+    if (e && e.code === "revoked") return "L’accesso alla pagina è stato revocato.";
+    return "Qualcosa non ha funzionato. Riprova tra un attimo.";
+  }
+
+  /* ---------- Setup ---------- */
+  function modeVal() { return document.querySelector('input[name="mode"]:checked').value; }
+  function roleVal() { return document.querySelector('input[name="role"]:checked').value; }
+
+  function syncSetup() {
+    var online = modeVal() === "online";
+    var join = online && roleVal() === "join";
+    $("roleSet").hidden = !online;
+    $("fieldB").hidden = online;
+    $("codeField").hidden = !join;
+    $("symSet").hidden = join;
+    $("winSet").hidden = join;
+    $("timerSet").hidden = join;
+    $("lblA").textContent = online ? "Il tuo nome" : "Giocatore A";
+    $("nameA").placeholder = online ? "Il tuo nome" : "Giocatore A";
+    $("legSym").textContent = online ? "Il tuo simbolo" : "Simbolo del Giocatore A";
+    $("goBtn").textContent = !online ? "Inizia la partita" : (join ? "Entra nella stanza" : "Crea la stanza");
+    $("setupErr").hidden = true;
+  }
+  $("setupForm").addEventListener("change", syncSetup);
+
+  function loadNames() {
+    try {
+      var raw = localStorage.getItem("nct-names");
+      if (raw) {
+        var n = JSON.parse(raw);
+        if (n && typeof n[0] === "string") $("nameA").value = n[0];
+        if (n && typeof n[1] === "string") $("nameB").value = n[1];
+      }
+    } catch (e) {}
+  }
+  function saveNames() {
+    try { localStorage.setItem("nct-names", JSON.stringify([$("nameA").value.trim(), $("nameB").value.trim()])); } catch (e) {}
+  }
+  function setupError(msg) {
+    $("setupErr").textContent = msg;
+    $("setupErr").hidden = false;
+  }
+  function busy(on) { $("goBtn").disabled = on; }
+
+  $("setupForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    $("setupErr").hidden = true;
+    var online = modeVal() === "online";
+    var join = online && roleVal() === "join";
+    saveNames();
+    var sa = document.querySelector('input[name="symA"]:checked').value;
+    var wl = parseInt(document.querySelector('input[name="winLen"]:checked').value, 10);
+    var timer = $("timerOn").checked;
+    var nameA = $("nameA").value.trim().slice(0, 16);
+
+    if (!online) {
+      var a = nameA || "Giocatore A";
+      var b = ($("nameB").value.trim() || "Giocatore B").slice(0, 16);
+      if (norm(a) === norm(b)) b = b + " (2)";
+      newGame({ names: [a, b], syms: [sa, sa === "O" ? "X" : "O"], winLen: wl, timer: timer, start: 0 });
+      return;
+    }
+    if (!db) { setupError("Il gioco online non è disponibile su questo schermo."); return; }
+    busy(true);
+    var job;
+    if (join) {
+      var code = $("code").value.trim().toUpperCase();
+      if (code.length !== 4) { busy(false); setupError("Il codice ha 4 caratteri."); $("code").focus(); return; }
+      job = joinRoom(code, nameA || "Giocatore B");
+    } else {
+      job = createRoom({ names: [nameA || "Giocatore A", ""], syms: [sa, sa === "O" ? "X" : "O"], winLen: wl, timer: timer, start: 0 });
+    }
+    job.then(function () { busy(false); }, function (err) { busy(false); setupError(errText(err)); });
+  });
+
+  /* ---------- State ---------- */
+  function newState(cfg) {
+    return {
+      names: cfg.names, syms: cfg.syms, winLen: cfg.winLen, timer: !!cfg.timer, start: cfg.start,
+      cats: shuffle(CATS).slice(0, N),
+      letters: shuffle(LETTERS).slice(0, N).sort(),
+      board: Array.from({ length: N }, function () { return Array(N).fill(null); }),
+      turn: cfg.start, over: null, history: [],
+      players: cfg.players || ["", ""], status: cfg.status || "playing", rev: cfg.rev || 0
+    };
+  }
+
+  function toDoc(s) {
+    var flat = [];
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) {
+      var m = s.board[r][c];
+      flat.push(m ? { p: m.p, text: m.text } : null);
+    }
+    return {
+      v: 1, status: s.status, players: s.players, names: s.names, syms: s.syms,
+      winLen: s.winLen, timer: !!s.timer, start: s.start, cats: s.cats, letters: s.letters,
+      board: flat, turn: s.turn,
+      over: s.over ? {
+        type: s.over.type, p: s.over.p == null ? -1 : s.over.p, kind: s.over.kind || "",
+        line: (s.over.line || []).map(function (x) { return x[0] * N + x[1]; })
+      } : null,
+      history: s.history.map(function (h) { return h.r * N + h.c; }),
+      rev: s.rev || 0
+    };
+  }
+
+  function fromDoc(d) {
+    var board = Array.from({ length: N }, function () { return Array(N).fill(null); });
+    for (var i = 0; i < N * N; i++) {
+      var e = d.board && d.board[i];
+      if (e) board[Math.floor(i / N)][i % N] = { p: e.p, text: e.text };
+    }
+    return {
+      names: d.names.slice(), syms: d.syms.slice(), winLen: d.winLen, timer: !!d.timer, start: d.start,
+      cats: d.cats.slice(), letters: d.letters.slice(), board: board, turn: d.turn,
+      over: d.over ? {
+        type: d.over.type, p: d.over.p, kind: d.over.kind,
+        line: (d.over.line || []).map(function (k) { return [Math.floor(k / N), k % N]; })
+      } : null,
+      history: (d.history || []).map(function (k) { return { r: Math.floor(k / N), c: k % N }; }),
+      players: d.players.slice(), status: d.status, rev: d.rev || 0
+    };
+  }
+
+  function newGame(cfg) {
+    var carry = room && S ? { players: S.players, status: "playing", rev: S.rev } : {};
+    S = newState(Object.assign({}, cfg, carry));
+    focusPos = { r: 0, c: 0 };
+    show("game");
+    gridKey = S.cats.join("|") + "#" + S.letters.join("");
+    buildGrid();
+    renderAll();
+    announce("Nuova partita. " + turnLine());
+    $("turnText").focus();
+    pushState();
+  }
+
+  /* ---------- Grid ---------- */
+  function buildGrid() {
+    var t = $("board");
+    t.textContent = "";
+    var cap = document.createElement("caption");
+    cap.className = "sr-only";
+    cap.textContent = "Griglia 6 per 6. Le categorie sono nelle righe, le lettere nelle colonne. Usa le frecce per spostarti tra le caselle.";
+    t.appendChild(cap);
+
+    var cg = document.createElement("colgroup");
+    var rh = document.createElement("col"); rh.className = "rh"; cg.appendChild(rh);
+    for (var i = 0; i < N; i++) cg.appendChild(document.createElement("col"));
+    t.appendChild(cg);
+
+    var thead = document.createElement("thead");
+    var hr = document.createElement("tr");
+    var corner = document.createElement("th");
+    corner.innerHTML = '<span class="sr-only">Categoria e lettera</span>';
+    hr.appendChild(corner);
+    S.letters.forEach(function (L) {
+      var th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = L;
+      hr.appendChild(th);
+    });
+    thead.appendChild(hr);
+    t.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    for (var r = 0; r < N; r++) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.scope = "row";
+      var v = document.createElement("span");
+      v.className = "vtext";
+      v.textContent = S.cats[r];
+      th.appendChild(v);
+      tr.appendChild(th);
+      for (var c = 0; c < N; c++) {
+        var td = document.createElement("td");
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "cell";
+        b.dataset.r = r;
+        b.dataset.c = c;
+        td.appendChild(b);
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    t.appendChild(tbody);
+  }
+
+  function cellBtn(r, c) {
+    return $("board").querySelector('button.cell[data-r="' + r + '"][data-c="' + c + '"]');
+  }
+  function inWinLine(r, c) {
+    if (!S.over || S.over.type !== "win") return false;
+    return S.over.line.some(function (p) { return p[0] === r && p[1] === c; });
+  }
+
+  function updateCell(r, c) {
+    var b = cellBtn(r, c);
+    var m = S.board[r][c];
+    var L = S.letters[c], cat = S.cats[r];
+    var win = inWinLine(r, c);
+    b.parentNode.classList.toggle("win-cell", win);
+    if (!m) {
+      b.className = "cell";
+      b.innerHTML = "";
+      b.setAttribute("aria-label", cat + ", lettera " + L + ": libera");
+      b.setAttribute("aria-disabled", (S.over || !canMove()) ? "true" : "false");
+    } else {
+      var s = sym(m.p);
+      b.className = "cell filled sym-" + s;
+      b.innerHTML = '<span class="mark">' + SVG[s] + '</span><span class="ans"></span>';
+      b.querySelector(".ans").textContent = m.text;
+      b.setAttribute("aria-label", cat + ", lettera " + L + ": " + m.text + ", " + pname(m.p) + " con " + s + (win ? ", parte della linea vincente" : ""));
+      b.setAttribute("aria-disabled", "true");
+    }
+  }
+
+  function syncTab() {
+    var all = $("board").querySelectorAll("button.cell");
+    for (var i = 0; i < all.length; i++) {
+      var b = all[i];
+      b.tabIndex = (+b.dataset.r === focusPos.r && +b.dataset.c === focusPos.c) ? 0 : -1;
+    }
+  }
+
+  function canMove() { return !room || S.turn === room.me; }
+
+  function turnLine() {
+    if (S.over) return S.over.type === "win" ? "Ha vinto " + pname(S.over.p) + "." : "Pareggio.";
+    if (room) return S.turn === room.me ? "Tocca a te." : "Tocca a " + pname(S.turn) + ".";
+    return "Tocca a " + pname(S.turn) + ".";
+  }
+
+  function renderStatus() {
+    for (var p = 0; p < 2; p++) {
+      $("pname" + p).textContent = pname(p) + (room && room.me === p ? " (tu)" : "");
+      $("chip" + p).innerHTML = SVG[sym(p)];
+      $("chip" + p).className = "chip sym-" + sym(p);
+      var active = !S.over && S.turn === p;
+      $("card" + p).classList.toggle("active", active);
+      $("ptag" + p).hidden = !active;
+    }
+    var tt = $("turnText");
+    if (!S.over) {
+      if (room) {
+        tt.textContent = S.turn === room.me
+          ? "Tocca a te (" + sym(S.turn) + "): scegli una casella libera."
+          : "Tocca a " + pname(S.turn) + ": aspetta la sua mossa.";
+      } else {
+        tt.textContent = "Tocca a " + pname(S.turn) + " (" + sym(S.turn) + "): scegli una casella libera.";
+      }
+    } else if (S.over.type === "win") {
+      tt.textContent = (room && S.over.p === room.me) ? "Hai vinto." : "Ha vinto " + pname(S.over.p) + ".";
+    } else {
+      tt.textContent = "Pareggio.";
+    }
+
+    var res = $("result");
+    if (S.over) {
+      res.hidden = false;
+      if (S.over.type === "win") {
+        $("resultTitle").textContent = (room && S.over.p === room.me) ? "Hai vinto!" : "Ha vinto " + pname(S.over.p) + "!";
+        $("resultText").textContent = "Ha completato " + S.over.kind + " di " + sym(S.over.p) + ".";
+      } else {
+        $("resultTitle").textContent = "Pareggio";
+        $("resultText").textContent = "Tutte le caselle sono piene e nessuno ha completato una linea.";
+      }
+    } else {
+      res.hidden = true;
+    }
+
+    var last = S.history[S.history.length - 1];
+    var lm = $("lastMove"), cb = $("contestBtn");
+    if (last) {
+      var m = S.board[last.r][last.c];
+      lm.hidden = false;
+      lm.textContent = "Ultima risposta: «" + m.text + "» di " + pname(m.p) + " (" + S.cats[last.r] + ", " + S.letters[last.c] + ").";
+      cb.hidden = !!(room && m.p === room.me);
+    } else {
+      lm.hidden = true;
+      cb.hidden = true;
+    }
+
+    $("restartBtn").textContent = room ? "Esci dalla stanza" : "Ricomincia";
+    $("editBtn").textContent = room ? "Esci dalla stanza" : "Cambia giocatori";
+    var ri = $("roomInfo");
+    if (room) { ri.hidden = false; ri.textContent = "Stanza " + room.code; } else { ri.hidden = true; }
+  }
+
+  function renderAll() {
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) updateCell(r, c);
+    syncTab();
+    renderStatus();
+  }
+
+  /* ---------- Win check ---------- */
+  function checkWin() {
+    var dirs = [[0, 1, "una riga"], [1, 0, "una colonna"], [1, 1, "una diagonale"], [1, -1, "una diagonale"]];
+    function same(r, c, p) {
+      return r >= 0 && r < N && c >= 0 && c < N && S.board[r][c] && S.board[r][c].p === p;
+    }
+    for (var r = 0; r < N; r++) {
+      for (var c = 0; c < N; c++) {
+        var m = S.board[r][c];
+        if (!m) continue;
+        for (var d = 0; d < dirs.length; d++) {
+          var dr = dirs[d][0], dc = dirs[d][1];
+          if (same(r - dr, c - dc, m.p)) continue;
+          var line = [], rr = r, cc = c;
+          while (same(rr, cc, m.p)) { line.push([rr, cc]); rr += dr; cc += dc; }
+          if (line.length >= S.winLen) return { p: m.p, line: line, kind: dirs[d][2] };
+        }
+      }
+    }
+    return null;
+  }
+
+  /* ---------- Playing ---------- */
+  $("board").addEventListener("click", function (e) {
+    var b = e.target.closest("button.cell");
+    if (!b || !S) return;
+    var r = +b.dataset.r, c = +b.dataset.c;
+    focusPos = { r: r, c: c };
+    syncTab();
+    if (S.over) { announce("La partita è finita."); return; }
+    if (!canMove()) { announce("Non è il tuo turno. Tocca a " + pname(S.turn) + "."); return; }
+    if (S.board[r][c]) { announce("Casella già occupata."); return; }
+    openAnswer(r, c);
+  });
+
+  $("board").addEventListener("keydown", function (e) {
+    var b = e.target.closest("button.cell");
+    if (!b) return;
+    var r = +b.dataset.r, c = +b.dataset.c, k = e.key;
+    if (k === "ArrowRight") c = Math.min(N - 1, c + 1);
+    else if (k === "ArrowLeft") c = Math.max(0, c - 1);
+    else if (k === "ArrowDown") r = Math.min(N - 1, r + 1);
+    else if (k === "ArrowUp") r = Math.max(0, r - 1);
+    else if (k === "Home") { c = 0; if (e.ctrlKey) r = 0; }
+    else if (k === "End") { c = N - 1; if (e.ctrlKey) r = N - 1; }
+    else return;
+    e.preventDefault();
+    focusPos = { r: r, c: c };
+    syncTab();
+    cellBtn(r, c).focus();
+  });
+
+  /* ---------- Timer ---------- */
+  var tmr = null, deadline = 0, said5 = false;
+  function stopTimer() { if (tmr) { clearInterval(tmr); tmr = null; } }
+  function startTimer() {
+    stopTimer();
+    if (!S.timer) { $("ansTimer").hidden = true; return; }
+    $("ansTimer").hidden = false;
+    deadline = Date.now() + LIMIT * 1000;
+    said5 = false;
+    tick();
+    tmr = setInterval(tick, 200);
+    setTimeout(function () { if (tmr) $("ansLive").textContent = "Hai " + LIMIT + " secondi."; }, 150);
+  }
+  function tick() {
+    var left = Math.max(0, deadline - Date.now());
+    var secs = Math.ceil(left / 1000);
+    $("ansSecs").textContent = String(secs);
+    $("ansBar").style.width = (left / (LIMIT * 1000) * 100) + "%";
+    $("ansTimer").classList.toggle("low", secs <= 5);
+    if (secs <= 5 && !said5) { said5 = true; $("ansLive").textContent = "Cinque secondi."; }
+    if (left <= 0) { stopTimer(); timeUp(); }
+  }
+  function timeUp() {
+    if (!pending || !S || S.over) return;
+    var who = S.turn;
+    $("answerDlg").close();
+    S.turn = 1 - who;
+    renderAll();
+    announce("Tempo scaduto per " + pname(who) + ". " + turnLine());
+    pushState();
+  }
+
+  /* ---------- Answer dialog ---------- */
+  function openAnswer(r, c) {
+    pending = { r: r, c: c };
+    var L = S.letters[c];
+    $("ansTitle").textContent = S.cats[r] + " con la " + L;
+    $("ansWho").className = "who sym-" + sym(S.turn);
+    $("ansWho").innerHTML = SVG[sym(S.turn)] + '<span style="color:var(--ink)"></span>';
+    $("ansWho").lastChild.textContent = pname(S.turn);
+    $("ansHint").textContent = "Una parola della categoria «" + S.cats[r] + "» che inizia con la lettera " + L + ".";
+    $("ansInput").value = "";
+    $("ansLive").textContent = "";
+    $("ansErr").hidden = true;
+    $("ansErr").textContent = "";
+    $("ansInput").removeAttribute("aria-invalid");
+    openDlg($("answerDlg"));
+    setTimeout(function () { $("ansInput").focus(); }, 0);
+    startTimer();
+  }
+
+  function fail(msg) {
+    $("ansErr").textContent = msg;
+    $("ansErr").hidden = false;
+    $("ansInput").setAttribute("aria-invalid", "true");
+    $("ansInput").focus();
+  }
+
+  $("ansForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!pending || !S || S.over) return;
+    var r = pending.r, c = pending.c, L = S.letters[c];
+    var raw = $("ansInput").value.trim().replace(/\s+/g, " ");
+    if (raw.length < 2) { fail("Scrivi almeno due lettere."); return; }
+    if (norm(raw.charAt(0)) !== norm(L)) { fail("La risposta deve iniziare con la " + L + "."); return; }
+    $("answerDlg").close();
+    place(r, c, upFirst(raw));
+  });
+  $("ansCancel").addEventListener("click", function () { $("answerDlg").close(); });
+  $("answerDlg").addEventListener("close", function () { stopTimer(); pending = null; });
+
+  function moveMessage(r, c, p) {
+    var msg = pname(p) + " ha scritto " + S.board[r][c].text + " per " + S.cats[r] + " con la " + S.letters[c] + ". ";
+    if (S.over && S.over.type === "win") {
+      msg += (room && p === room.me ? "Hai vinto" : "Ha vinto " + pname(p)) + ": ha completato " + S.over.kind + " di " + sym(p) + ".";
+    } else if (S.over) {
+      msg += "Pareggio: tutte le caselle sono piene.";
+    } else {
+      msg += turnLine();
+    }
+    return msg;
+  }
+
+  function place(r, c, text) {
+    var p = S.turn;
+    S.board[r][c] = { p: p, text: text };
+    S.history.push({ r: r, c: c });
+    var w = checkWin();
+    if (w) {
+      S.over = { type: "win", p: w.p, line: w.line, kind: w.kind };
+    } else if (S.history.length === N * N) {
+      S.over = { type: "draw" };
+    } else {
+      S.turn = 1 - p;
+    }
+    renderAll();
+    var b = cellBtn(r, c);
+    b.classList.add("pop");
+    setTimeout(function () { b.classList.remove("pop"); }, 400);
+    announce(moveMessage(r, c, p));
+    pushState();
+    if (S.over) { $("result").focus(); } else { b.focus(); }
+  }
+
+  /* ---------- Confirm dialog ---------- */
+  function confirmDlg(o) {
+    return new Promise(function (resolve) {
+      var d = $("confirmDlg");
+      $("cfTitle").textContent = o.title;
+      $("cfBody").textContent = o.body;
+      $("cfOk").textContent = o.ok;
+      $("cfNo").textContent = o.cancel;
+      d.returnValue = "";
+      function done() { d.removeEventListener("close", done); resolve(d.returnValue === "ok"); }
+      d.addEventListener("close", done);
+      openDlg(d);
+    });
+  }
+  ["answerDlg", "confirmDlg"].forEach(function (id) {
+    var d = $(id);
+    d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+  });
+
+  $("contestBtn").addEventListener("click", function () {
+    var last = S.history[S.history.length - 1];
+    if (!last) return;
+    var m = S.board[last.r][last.c];
+    confirmDlg({
+      title: "Contestare la risposta?",
+      body: "«" + m.text + "» di " + pname(m.p) + " per " + S.cats[last.r] + " con la " + S.letters[last.c] +
+        ". Se la contesti, la casella torna libera e tocca a " + pname(1 - m.p) + ".",
+      ok: "Sì, contesta",
+      cancel: "No, lascia"
+    }).then(function (ok) {
+      if (!ok) return;
+      S.board[last.r][last.c] = null;
+      S.history.pop();
+      S.over = null;
+      S.turn = 1 - m.p;
+      focusPos = { r: last.r, c: last.c };
+      renderAll();
+      announce("Risposta «" + m.text + "» contestata e rimossa. " + turnLine());
+      pushState();
+      cellBtn(last.r, last.c).focus();
+    });
+  });
+
+  function backToSetup() {
+    if (room) leaveRoom();
+    S = null;
+    show("setup");
+    syncSetup();
+    $("nameA").focus();
+  }
+
+  $("restartBtn").addEventListener("click", function () {
+    if (room) {
+      confirmDlg({
+        title: "Uscire dalla stanza?",
+        body: "L’avversario resta nella stanza, ma la partita si ferma.",
+        ok: "Sì, esco",
+        cancel: "No, resto"
+      }).then(function (ok) { if (ok) backToSetup(); });
+    } else if (S && S.history.length > 0 && !S.over) {
+      confirmDlg({
+        title: "Ricominciare?",
+        body: "La partita in corso andrà persa.",
+        ok: "Sì, ricomincia",
+        cancel: "No, continua"
+      }).then(function (ok) { if (ok) backToSetup(); });
+    } else {
+      backToSetup();
+    }
+  });
+  $("editBtn").addEventListener("click", backToSetup);
+  $("rematchBtn").addEventListener("click", function () {
+    newGame({ names: S.names, syms: S.syms, winLen: S.winLen, timer: S.timer, start: 1 - S.start });
+  });
+
+  /* ---------- Online ---------- */
+  function genCode() {
+    var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+    return s;
+  }
+
+  function pushState() {
+    if (!room || !S) return;
+    S.rev = (S.rev || 0) + 1;
+    var data = toDoc(S);
+    var ref = room.ref;
+    pushing = pushing.then(function () { return ref.set(data); }).then(function () {
+      $("netMsg").hidden = true;
+    }, function (e) {
+      $("netMsg").textContent = "Non riesco a salvare la mossa. " + errText(e);
+      $("netMsg").hidden = false;
+    });
+  }
+
+  function remember(code) { try { sessionStorage.setItem("nct-room", code); } catch (e) {} }
+  function forget() { try { sessionStorage.removeItem("nct-room"); } catch (e) {} }
+
+  function leaveRoom() {
+    if (room && room.unsub) { try { room.unsub(); } catch (e) {} }
+    room = null;
+    forget();
+    $("netMsg").hidden = true;
+  }
+
+  function startListening(code, me) {
+    var ref = db.doc("games/" + code);
+    room = { code: code, me: me, ref: ref, unsub: null };
+    room.unsub = ref.onSnapshot(onRoom, function (e) {
+      $("netMsg").textContent = errText(e);
+      $("netMsg").hidden = false;
+    });
+    remember(code);
+  }
+
+  async function createRoom(cfg) {
+    var code = "", ref, snap, tries = 0;
+    do {
+      code = genCode();
+      ref = db.doc("games/" + code);
+      snap = await withTimeout(ref.get(), 10000);
+      tries++;
+    } while (snap.exists && tries < 6);
+    var base = newState(Object.assign({}, cfg, { players: [cid, ""], status: "waiting", rev: 1 }));
+    await withTimeout(ref.set(toDoc(base)), 10000);
+    S = null;
+    startListening(code, 0);
+    $("waitCode").textContent = code;
+    $("waitCodeSpoken").textContent = "Codice stanza: " + code.split("").join(", ") + ".";
+    show("waiting");
+    $("waitTitle").focus();
+  }
+
+  async function joinRoom(code, name) {
+    var ref = db.doc("games/" + code);
+    var snap = await withTimeout(ref.get(), 10000);
+    if (!snap.exists) throw { msg: "Stanza non trovata. Controlla il codice." };
+    var d = snap.data();
+    var me = -1;
+    if (d.players[0] === cid) me = 0; else if (d.players[1] === cid) me = 1;
+    if (me < 0) {
+      if (d.players[1]) throw { msg: "La stanza è già piena." };
+      var lock = db.doc("games/" + code + "/lock/seat");
+      var a = await withTimeout(lock.acquire({ holder: cid, ttlMs: 4000 }), 10000);
+      if (!a.acquired) throw { msg: "Un altro giocatore sta entrando. Riprova tra un attimo." };
+      snap = await withTimeout(ref.get(), 10000);
+      d = snap.data();
+      if (d.players[1]) throw { msg: "La stanza è già piena." };
+      var nm = name;
+      if (norm(nm) === norm(d.names[0])) nm = nm + " (2)";
+      await withTimeout(ref.update({
+        players: [d.players[0], cid], names: [d.names[0], nm], status: "playing", rev: (d.rev || 0) + 1
+      }), 10000);
+      me = 1;
+    }
+    startListening(code, me);
+  }
+
+  function onRoom(snap) {
+    if (!room) return;
+    if (!snap.exists) {
+      $("netMsg").textContent = "La stanza non esiste più.";
+      $("netMsg").hidden = false;
+      return;
+    }
+    var d = snap.data();
+    if (!d) return;
+    if (d.status === "waiting") {
+      if (room.me === 0) {
+        $("waitCode").textContent = room.code;
+        $("waitCodeSpoken").textContent = "Codice stanza: " + room.code.split("").join(", ") + ".";
+        if ($("waiting").hidden) { show("waiting"); }
+      }
+      return;
+    }
+    adopt(d);
+  }
+
+  function adopt(d) {
+    var ns = fromDoc(d);
+    if (S && ns.rev <= S.rev) return;
+    var prev = S, prevLen = S ? S.history.length : 0, prevKey = gridKey;
+    S = ns;
+    var key = S.cats.join("|") + "#" + S.letters.join("");
+    var fresh = !prev || key !== prevKey || $("game").hidden;
+    if (fresh) { gridKey = key; focusPos = { r: 0, c: 0 }; buildGrid(); }
+    show("game");
+    renderAll();
+    if (fresh) {
+      announce("Partita iniziata. " + turnLine());
+      $("turnText").focus();
+    } else if (S.history.length > prevLen) {
+      var h = S.history[S.history.length - 1];
+      announce(moveMessage(h.r, h.c, S.board[h.r][h.c].p));
+    } else {
+      announce(turnLine());
+    }
+  }
+
+  $("cancelRoom").addEventListener("click", function () {
+    var ref = room && room.ref;
+    leaveRoom();
+    if (ref) { ref.delete().catch(function () {}); }
+    show("setup");
+    syncSetup();
+    $("nameA").focus();
+  });
+
+  /* ---------- Boot ---------- */
+  function boot(data) {
+    loadNames();
+    syncSetup();
+    if (data && data.S && data.S.board && !data.online) {
+      S = data.S;
+      gridKey = S.cats.join("|") + "#" + S.letters.join("");
+      show("game");
+      buildGrid();
+      renderAll();
+    } else {
+      show("setup");
+    }
+    var dbp = (window.claude && typeof window.claude.use === "function")
+      ? window.claude.use("db").catch(function () { return null; })
+      : Promise.resolve(null);
+    dbp.then(function (handle) {
+      if (!handle) return;
+      db = handle;
+      $("modeSet").hidden = false;
+      var saved = null;
+      try { saved = sessionStorage.getItem("nct-room"); } catch (e) {}
+      if (saved && !S) { joinRoom(saved, "Giocatore B").catch(function () { forget(); }); }
+    });
+  }
+  try {
+    var hot = window.claude && window.claude.hot;
+    if (hot && typeof hot.snapshot === "function") hot.snapshot(function () { return { S: S, online: !!room }; });
+    if (hot && typeof hot.ready === "function") hot.ready(boot);
+    else boot(hot && hot.data ? hot.data : {});
+  } catch (err) {
+    boot({});
+  }
+})();
+</script>
+
+</body>
+</html>
